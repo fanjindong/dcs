@@ -29,6 +29,7 @@ func (t TcpService) Run() {
 			fmt.Println("Tcp Accept Error:", err.Error())
 			continue
 		}
+		fmt.Println("Tcp Open Conn:", conn)
 		go h.Process(conn)
 	}
 }

@@ -4,13 +4,12 @@ import (
 	"bufio"
 	"errors"
 	"github.com/fanjindong/dcs/utils"
-	"io"
 	"strconv"
 )
 
 type Decoder interface {
-	Request(reader io.Reader) (utils.Operation, *utils.Kv, error)
-	Response(reader io.Reader) (string, error)
+	Request(reader *bufio.Reader) (utils.Operation, *utils.Kv, error)
+	Response(reader *bufio.Reader) (string, error)
 }
 
 type DefaultDecoder struct{}
@@ -19,7 +18,7 @@ func NewDefaultDecoder() *DefaultDecoder {
 	return &DefaultDecoder{}
 }
 
-func (d DefaultDecoder) Request(reader io.Reader) (utils.Operation, *utils.Kv, error) {
+func (d DefaultDecoder) Request(reader *bufio.Reader) (utils.Operation, *utils.Kv, error) {
 	var (
 		op    utils.Operation
 		key   string
@@ -27,33 +26,31 @@ func (d DefaultDecoder) Request(reader io.Reader) (utils.Operation, *utils.Kv, e
 		err   error
 	)
 
-	r := bufio.NewReader(reader)
-	if op, err = d.readOp(r); err != nil {
+	if op, err = d.readOp(reader); err != nil {
 		return 0, nil, err
 	}
-	if key, err = d.readKey(r); err != nil {
+	if key, err = d.readKey(reader); err != nil {
 		return op, nil, err
 	}
 	switch op {
 	case utils.Set:
-		if value, err = d.readValue(r); err != nil {
+		if value, err = d.readValue(reader); err != nil {
 			return op, nil, err
 		}
 	}
 	return op, utils.NewKv(key, value), nil
 }
 
-func (d DefaultDecoder) Response(reader io.Reader) (string, error) {
+func (d DefaultDecoder) Response(reader *bufio.Reader) (string, error) {
 	var (
 		errMsg string
 		value  string
 		err    error
 	)
-	r := bufio.NewReader(reader)
-	if errMsg, err = d.readError(r); err != nil {
+	if errMsg, err = d.readError(reader); err != nil {
 		return value, err
 	}
-	if value, err = d.readValue(r); err != nil {
+	if value, err = d.readValue(reader); err != nil {
 		return value, err
 	}
 	if errMsg == "" {

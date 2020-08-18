@@ -1,6 +1,7 @@
 package client
 
 import (
+	"bufio"
 	"github.com/fanjindong/dcs/codec"
 	"github.com/fanjindong/dcs/utils"
 	"net"
@@ -27,7 +28,7 @@ func NewTcpClient() *TcpClient {
 }
 
 func (c *TcpClient) Command(op utils.Operation, kv ...string) (string, error) {
-	defer c.conn.Close()
+	//defer c.conn.Close()
 	body, err := c.encoder.Request(op, kv...)
 	if err != nil {
 		return "", err
@@ -35,5 +36,6 @@ func (c *TcpClient) Command(op utils.Operation, kv ...string) (string, error) {
 	if _, err := c.conn.Write(body); err != nil {
 		return "", err
 	}
-	return c.decoder.Response(c.conn)
+	reader := bufio.NewReader(c.conn)
+	return c.decoder.Response(reader)
 }
