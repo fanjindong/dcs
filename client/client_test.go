@@ -45,7 +45,11 @@ func TestTcpClient_Command(t *testing.T) {
 
 func BenchmarkTcpClient_Command(b *testing.B) {
 	c := NewTcpClient()
+	_, _ = c.Command(utils.Set, "k", "v")
+	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_, _ = c.Command(utils.Set, "k", "v")
+		//_, _ = c.Command(utils.Set, "k", "v")
+		//_, _ = c.Command(utils.Get, "k")
+		_, _ = c.Command(utils.Del, "k")
 	}
 }

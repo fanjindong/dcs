@@ -12,3 +12,13 @@ KeyValue = Key Value;
 Response = [Error] Value; 返回协议
 Error = Length SP *VCHAR
 ```
+
+性能测试：
+```
+Set operation:
+   20000	     67712 ns/op      14768/qps
+Get operation:
+   20000	     56604 ns/op      17666/qps
+Del operation:
+   20000	     64017 ns/op      15620/qps
+```
